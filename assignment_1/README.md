@@ -15,13 +15,13 @@ The cyan number is the "instantaneous" fps and the purple number below that is t
 
 However when I turned the ligths off in my room the average fps went up to a consistent 60 fps.
 
-4. Locating the brightest spot and marking it the image:
+4. Locating the brightest spot and marking it in the image:
 
 ![image 4](./images/last_frame_4.jpg)
 
 ![image 5](./images/last_frame_4_2.jpg)
 
-The fps went down about a consistent 1 fps by using the bright spot detection. Therefore the processing time didn't change much with this addition. The green circled followed the white case very precisely, as it was reflecting light from my monitor very well. The processing time did not appear to change when I did not display the image.
+The fps went down about a consistent 1 fps by using the bright spot detection. Therefore the processing time didn't change much with this addition. The green circle followed the white case very precisely, as it was reflecting light from my monitor very well. The processing time did not appear to change when I did not display the image.
 
 5. Locating and marking the reddest spot in the image. To do that I converted the frame to HSV color space. First I made upper and lower bounds for the HSV values for red, that I decided myself. The "reddest" hue values in my opinion are between 0-10 and 160-180. So for the bounds for the hue I picked those values, I then chose for the saturation value 100-255 and for the "value" value i picked 20-255. The masks were created using `cv.inRange()` and then `cv.bitwise_and()` was used on the frame to extract the values of the pixels in my HSV range. Then using `cv.minMaxLoc()` on only the saturation values (so more saturation, more red), the "reddest" spot on the frame was found.  
 
