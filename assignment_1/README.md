@@ -9,7 +9,7 @@
 
 ![image 2](./images/last_frame_3.jpg)
 
-The cyan number is the "instantaneous" fps and the purple number below that is the averaged fps. The average fps was oscillating between 40 and 60 fps. So on average the processing time for one frame was about 17 to 25 ms.
+The cyan number is the "instantaneous" fps and the purple number below that is the averaged fps. The average fps was oscillating between 40 and 60 fps. So on average the processing time for one frame was about 16 to 25 ms.
 
 ![image 3](./images/last_frame_3_2.jpg)
 
