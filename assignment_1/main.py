@@ -6,11 +6,11 @@ cap = cv.VideoCapture(0)
 # hsv red
 # lower boundary RED color range values; Hue (0 - 10)
 lower1_red = np.array([0, 100, 20])
-upper1_red = np.array([10, 255, 255])
+upper1_red = np.array([2, 255, 255])
  
 # upper boundary RED color range values; Hue (160 - 180)
-lower2_red = np.array([160,100,20])
-upper2_red = np.array([179,255,255])
+lower2_red = np.array([178,100,20])
+upper2_red = np.array([180,255,255])
 
 font = cv.FONT_HERSHEY_SIMPLEX
 average_fps = 0
