@@ -12,14 +12,18 @@ font = cv.FONT_HERSHEY_SIMPLEX
 average_fps = 0
 e1 = cv.getTickCount()
 
-
 intersect_of_lines = []
 
-im_out = np.zeros((480, 640, 3), np.uint8)
+#height and width in a4 paper ratio
+ratio = 1.414
+height = 400
+width = int(height*ratio)
+
+im_out = np.zeros((height, width, 3), np.uint8)
+
 while(True):
     # Capture frame-by-frame
     ret, frame = cap.read()
-    
     # reduce size of input image
     #frame = cv.resize(frame, (0,0), fx=0.5, fy=0.5)
     # convert to grayscale
@@ -28,11 +32,10 @@ while(True):
     gray = cv.GaussianBlur(gray, (5, 5), 0)
 
     # Canny edge detection
-    edges = cv.Canny(gray, 190, 200)
+    edges = cv.Canny(gray, 150, 200)
 
     # detect lines using hough transform, up to max 4 lines
-    #lines = cv.HoughLinesP(edges, 3, np.pi/180, threshold=200, maxLineGap=100, minLineLength=150, lines=4)
-    lines = cv.HoughLines(edges, 1, np.pi / 180, 150)
+    lines = cv.HoughLines(edges, 1, np.pi / 90, 100)
     
     
     # draw lines on image
@@ -57,14 +60,19 @@ while(True):
                     theta1 = lines[i][0][1]
                     rho2 = lines[j][0][0]
                     theta2 = lines[j][0][1]
+                    # check if lines are near parallel, if so skip
+                    if abs(theta1 - theta2) < 0.6:
+                        continue
                     a = np.cos(theta1)
                     b = np.sin(theta1)
                     c = np.cos(theta2)
                     d = np.sin(theta2)
                     x = (d*rho1 - b*rho2) / (a*d - b*c)
                     y = (a*rho2 - c*rho1) / (a*d - b*c)
-                    intersect_of_lines.append([x, y])
-                    cv.circle(frame, (int(x), int(y)), 5, (0, 255, 0), -1)
+                    # only append if intersection is within image frame
+                    if x > 0 and x < frame.shape[1] and y > 0 and y < frame.shape[0]:
+                        intersect_of_lines.append([x, y])
+                        cv.circle(frame, (int(x), int(y)), 5, (0, 255, 0), -1)
         except:
             pass
     
@@ -73,24 +81,27 @@ while(True):
     if lines is not None:
         print("Lines detected: " + str(len(lines)))
         print("intersections: " + str(len(intersect_of_lines)) + "\n")
-
-    # from 3 intersection points, find the 4th point
-    # which is the 4th corner of a rectangle
-    if len(intersect_of_lines) == 3:
-        # find the 4th point
-        x = intersect_of_lines[0][0] + intersect_of_lines[1][0] - intersect_of_lines[2][0]
-        y = intersect_of_lines[0][1] + intersect_of_lines[1][1] - intersect_of_lines[2][1]
-        intersect_of_lines.append([x, y])
     
 
     # Do a perspective transform on the image 
     if len(intersect_of_lines) == 4:
         pts1 = np.float32(intersect_of_lines)
-        # arrange points in order of top left, top right, bottom right, bottom left
-        pts1 = pts1[np.argsort(pts1[:, 0])]
-        pts2 = np.float32([[0, 0], [500, 0], [500, 500], [0, 500]])
+        # starting with point with smallest x value
+        pts1 = pts1[pts1[:,0].argsort()]
+        # check if y value of first point is larger than second point
+        # this is to make sure that the first point is the "bottom left" point
+        if pts1[0][1] > pts1[1][1]:
+            # if so, swap points
+            pts1[[0, 1]] = pts1[[1, 0]]
+        # check if y value of third point is larger than fourth point
+        if pts1[2][1] > pts1[3][1]:
+            # if so, swap points
+            pts1[[2, 3]] = pts1[[3, 2]]
+        pts2 = np.array([[0, 0], [height, 0], [0, width], [height, width]])
+
         M, status = cv.findHomography(pts1, pts2)
-        im_out = cv.warpPerspective(frame, M, (500, 500))
+        im_out = cv.warpPerspective(frame, M, (height, width))
+        im_out = cv.flip(im_out, 1)
     
     
     #######################################
@@ -99,8 +110,6 @@ while(True):
     e1 = cv.getTickCount()
     fps = 1/time
     average_fps = average_fps + (fps - average_fps)/100
-    #cv.putText(frame, str(np.round(fps,1)), (10, 50), font, 1, (255, 255, 0), 2, cv.LINE_AA)
-    #cv.putText(frame, str(np.round(average_fps,1)), (10, 100), font, 1, (125, 0, 255), 2, cv.LINE_AA)
     #######################################
     # Display the resulting frame
     # for phone portrait mode
@@ -111,7 +120,7 @@ while(True):
     cv.imshow('edges',edges)
     cv.imshow('frame',frame)
     if len(intersect_of_lines) == 4:
-        #perspective = cv.rotate(perspective, cv.ROTATE_90_CLOCKWISE)
+        #im_out = cv.rotate(im_out, cv.ROTATE_90_CLOCKWISE)
         cv.imshow('Top down view', im_out)
 
     intersect_of_lines = []

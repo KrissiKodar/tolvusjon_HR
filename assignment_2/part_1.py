@@ -38,45 +38,48 @@ N_samples = 30  # number of random samples from edge points
 
 while(True):
     # Capture frame-by-frame
-    ret, frame = cap.read()
-    # reduce size of input image
-    frame = cv.resize(frame, (0,0), fx=0.4, fy=0.4)
-    
-    # convert to grayscale
-    gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-    # reduce noise with median filter
-    gray = cv.medianBlur(gray, 5)
-    # Canny edge detection
-    edges = cv.Canny(gray, 150, 200)
+    try:
+        ret, frame = cap.read()
+        # reduce size of input image
+        frame = cv.resize(frame, (0,0), fx=0.4, fy=0.4)
 
-    # store coordinates of edges in array
-    edge_coordinates = np.where(edges == 255)
-    # store as x,y coordinates
-    edge_coordinates = np.array([edge_coordinates[1], edge_coordinates[0]]).T
+        # convert to grayscale
+        gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+        # reduce noise with median filter
+        gray = cv.medianBlur(gray, 5)
+        # Canny edge detection
+        edges = cv.Canny(gray, 150, 200)
+
+        # store coordinates of edges in array
+        edge_coordinates = np.where(edges == 255)
+        # store as x,y coordinates
+        edge_coordinates = np.array([edge_coordinates[1], edge_coordinates[0]]).T
 
 
-    # RANSAC
-    model = RANSAC(edge_coordinates, dist_thresh, N_samples)
-    # draw line on image
-    x = np.array([0, frame.shape[1]])
-    y = model[0] * x + model[1]
-    cv.line(frame, (int(x[0]), int(y[0])), (int(x[1]), int(y[1])), (0, 255, 0), 2)
+        # RANSAC
+        model = RANSAC(edge_coordinates, dist_thresh, N_samples)
+        # draw line on image
+        x = np.array([0, frame.shape[1]])
+        y = model[0] * x + model[1]
+        cv.line(frame, (int(x[0]), int(y[0])), (int(x[1]), int(y[1])), (0, 255, 0), 2)
 
-    # putting the FPS count on the frame
-    time = (cv.getTickCount() - e1)/ cv.getTickFrequency()
-    e1 = cv.getTickCount()
-    fps = 1/time
-    average_fps = average_fps + (fps - average_fps)/100
-    cv.putText(frame, str(np.round(fps,1)), (10, 50), font, 1, (255, 255, 0), 2, cv.LINE_AA)
-    cv.putText(frame, str(np.round(average_fps,1)), (10, 100), font, 1, (125, 0, 255), 2, cv.LINE_AA)
+        # putting the FPS count on the frame
+        time = (cv.getTickCount() - e1)/ cv.getTickFrequency()
+        e1 = cv.getTickCount()
+        fps = 1/time
+        average_fps = average_fps + (fps - average_fps)/100
+        cv.putText(frame, str(np.round(fps,1)), (10, 50), font, 1, (255, 255, 0), 2, cv.LINE_AA)
+        cv.putText(frame, str(np.round(average_fps,1)), (10, 100), font, 1, (125, 0, 255), 2, cv.LINE_AA)
 
-    # Display the resulting frame
-    cv.imshow('frame',frame)
-    cv.imshow('edges',edges)
-    if cv.waitKey(1) & 0xFF == ord('q'):
-        # save the last frame
-        cv.imwrite('.\images\last_frame.jpg', frame)
-        break
+        # Display the resulting frame
+        cv.imshow('frame',frame)
+        cv.imshow('edges',edges)
+        if cv.waitKey(1) & 0xFF == ord('q'):
+            # save the last frame
+            cv.imwrite('.\images\last_frame.jpg', frame)
+            break
+    except:
+        pass
 
 # When everything done, release the capture
 cap.release()
