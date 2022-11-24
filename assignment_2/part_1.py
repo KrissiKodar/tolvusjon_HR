@@ -6,7 +6,7 @@ import warnings
 # turn off warnings
 warnings.filterwarnings("ignore")
 # capture video from camera
-cap = cv.VideoCapture(0)
+cap = cv.VideoCapture(1)
 
 font = cv.FONT_HERSHEY_SIMPLEX
 average_fps = 0
@@ -34,7 +34,7 @@ def RANSAC(points, distance_threshold, samples):
     return best_model
 
 dist_thresh = 1 # pixel distance threshold
-N_samples = 30  # number of random samples from edge points
+N_samples = 70  # number of random samples from edge points
 
 while(True):
     # Capture frame-by-frame

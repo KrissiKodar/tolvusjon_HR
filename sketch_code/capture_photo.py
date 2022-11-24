@@ -17,7 +17,7 @@ while(True):
         cv.imshow('frame',frame)
         if cv.waitKey(1) & 0xFF == ord('q'):
             # save the last frame
-            cv.imwrite('.\paper2.jpg', frame)
+            cv.imwrite('.\one_3.jpg', frame)
             break
     except:
         print('error')

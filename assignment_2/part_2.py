@@ -6,7 +6,7 @@ import warnings
 # turn off warnings
 warnings.filterwarnings("ignore")
 # capture video from camera
-cap = cv.VideoCapture(1)
+cap = cv.VideoCapture(0)
 
 font = cv.FONT_HERSHEY_SIMPLEX
 average_fps = 0
