@@ -1,4 +1,4 @@
-# Assignment 2 - Object detection using a pre-trained model
+# Assignment 3 - Object detection using a pre-trained model
 
 After following the tutorial, I got the DNN module with the Yolo v3 model to work. 
 
