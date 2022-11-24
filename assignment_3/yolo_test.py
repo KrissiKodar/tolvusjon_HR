@@ -51,7 +51,6 @@ def findObjects(outputs, img):
             i = i[0]
         box = bbox[i]
         x, y, w, h = box[0], box[1], box[2], box[3]
-        # have each rectangle be a different color
         cv.rectangle(img, (x, y), (x + w, y + h), (10, 0, 255), 1)
         cv.putText(img, f'{classNames[classIds[i]].upper()} {int(confs[i] * 100)}%',
                    (x, y - 10), cv.FONT_HERSHEY_SIMPLEX, 0.3, (10, 0, 255), 1)
